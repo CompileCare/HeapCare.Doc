@@ -1257,14 +1257,21 @@ Exact-head API CI [#46160914047](https://github.com/HeapCare/HeapCare.Api/action
 
 ### Phase 5 — actual browser flow for role management
 
-HeapCare.Web PR #103 added a real-Keycloak Playwright scenario using the synthetic Tenant A HospitalAdmin to open the Roles & permissions workspace, create a custom role with an audit reason, add a delegated facility permission, and deactivate/reactivate the unassigned role with reasons. It supplements the existing component tests and Local API acceptance with an authenticated UI journey.
+HeapCare.Web PR #103 added a real-Keycloak Playwright scenario for the Tenant A HospitalAdmin to open the Roles & permissions workspace, create a custom role with an audit reason, edit its permission set, and deactivate/reactivate it with mandatory reasons. This supplements component tests and the Local API acceptance with an authenticated UI journey.
 
-- PR: [HeapCare.Web #103](https://github.com/HeapCare/HeapCare.Web/pull/103), merged as `3134b8bf9bb65a0d8dbeafa521c8ec10220038e5`.
-- Exact-head Web CI run [#46158890530](https://github.com/HeapCare/HeapCare.Web/actions/runs/46158890530) passed build/test and the Firefox/WebKit accessibility jobs.
-- The first Local browser replay found a strict-mode ambiguity because both the shell `h1` and workspace `h2` use the same accessible heading text; the authenticated route rendered correctly, and the failure occurred before create/edit/lifecycle actions. Web PR #104 scoped the assertion to the role component region and merged as `32e00251cfaef8b06d1e2d18c5b74adf8e3bcac4`; exact-head Web CI run [#46159723577](https://github.com/HeapCare/HeapCare.Web/actions/runs/46159723577) passed all three jobs.
-- Local run [#46160730471](https://github.com/HeapCare/HeapCare.Local/actions/runs/46160730471) passed the nine-service stack, real-Keycloak custom-role API acceptance, PostgreSQL restore and Chromium role create/edit/deactivate/reactivate journey. Its later Firefox/WebKit stage failed because the same state-changing role lifecycle test ran a second time against the shared tenant database and created duplicate role cards; the six-role read-only cases are not the source of the failure.
-- Web PR #107 adds a Playwright skip for this state-changing scenario on non-Chromium engines while retaining the six-role Firefox/WebKit accessibility baselines. It merged as `3d0c7e0cda2c62fc310e17e1f562e1fbffa2d7f4`; exact-head Web CI [#46161797317](https://github.com/HeapCare/HeapCare.Web/actions/runs/46161797317) passed all three jobs.
-- Local PR #50 now documents the corrected browser matrix on head `baf7398a0044ce7d7104952057f64d9d0fd41d0d`: the mutating role lifecycle runs on Chromium only, while Firefox and WebKit retain the six-role read-only baseline. Local workflow run [#46162297400](https://github.com/HeapCare/HeapCare.Local/actions/runs/46162297400) is running on that exact head; the full-stack job and tooling validation must both complete successfully, including PostgreSQL restore and cleanup, before PR #50 can merge or this browser lifecycle be marked accepted. The earlier Web PR #108/#109 attempts were closed as unnecessary after the existing PR #107 Chromium-only guard was confirmed to address the shared-database collision.
+- Web PR #103 merged as `3134b8bf9bb65a0d8dbeafa521c8ec10220038e5`.
+- Web PR #104 fixed the shell/workspace heading strict-mode locator; merge commit `32e00251cfaef8b06d1e2d18c5b74adf8e3bcac4`.
+- Web PR #105 scoped the seeded custom-role assertion to the rendered role card; merge commit `3e7be1efae95d22c4c5e3eec798d632d041673b2`.
+- Web PR #107 fixed the shared-database test matrix: the state-changing role lifecycle scenario runs on Chromium only, while Firefox and Playwright WebKit retain the six-role read-only accessibility baseline. Merge commit `3d0c7e0cda2c62fc310e17e1f562e1fbffa2d7f4`. Exact-head Web CI [#46161797317](https://github.com/HeapCare/HeapCare.Web/actions/runs/46161797317) passed build/test and both browser smoke jobs.
+- HeapCare.Local PR #50 merged as `f08fab651d89af026ffd2b6a5822bb8c81a16ed7`. Exact-head full-stack run [#46162297400](https://github.com/HeapCare/HeapCare.Local/actions/runs/46162297400) passed both jobs. The run verified:
+  - Full nine-service stack, API readiness, OpenTelemetry trace/Npgsql-span and Collector-fed metrics checks.
+  - Real-Keycloak persisted-role API acceptance and delegated permission boundaries.
+  - PostgreSQL logical backup and isolated restore.
+  - **12/12 Chromium real-OIDC browser tests passed**, including role creation, permission edit, deactivation and reactivation through the actual Roles & permissions workspace.
+  - **6/6 authenticated role baseline checks passed on Firefox and 6/6 on Playwright WebKit**. The single mutating role-lifecycle test was correctly skipped in each read-only engine run.
+  - Ephemeral services, CI-only secrets and volumes were removed successfully.
+
+This closes the automated authenticated browser acceptance for the role-management UI. It does not close HeapCare.Doc #201: native Windows/macOS/Ubuntu assistive-technology checks, manual keyboard workflows, contrast measurements, 200%/400% reflow, and qualified WCAG 2.2 AA review remain outstanding.
 
 ### Unchanged gates
 
