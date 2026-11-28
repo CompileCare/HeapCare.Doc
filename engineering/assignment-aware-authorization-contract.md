@@ -83,7 +83,12 @@ Replace the single-role authorization context with an immutable request-local co
 - The permission codes currently granted by that role.
 - The exact scope rows attached to that assignment.
 
-Do not expose one flattened scope list as a security authority. Do not flatten permissions and scopes separately.
+Do not expose one flattened scope list as a security authority. Do not flatten permissions and scopes separately. 
+
+**Implementation progress (draft, dependent on HeapCare.Api #162):** HeapCare.Api [PR #163](https://github.com/HeapCare/HeapCare.Api/pull/163) adds a data-only `ITenantRoleAssignmentContext`. The membership reader loads only active, currently effective assignments whose TenantRole is active and whose own permission grants pass the canonical permission-catalogue validation. Each snapshot retains its own role, permissions and scope rows. Middleware populates this snapshot alongside the current legacy membership context.
+
+This increment deliberately adds **no authorization methods** to the new context and changes no route policy, claim, service-level scope check or clinical permission. The current legacy authorization remains authoritative until the scope policy is approved and every consumer is migrated. Keep the snapshot out of authorization decisions until that follow-up is complete.
+
 
 ### Required authorization API semantics
 
