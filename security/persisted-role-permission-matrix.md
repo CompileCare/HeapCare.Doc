@@ -173,7 +173,7 @@ These are synthetic isolated CI tests. They verify current implementation behavi
 
 ## Canonical catalogue and persisted RBAC implementation — 2026-11-28
 
-**Review state:** The catalogue and persisted-RBAC implementation are available in open HeapCare.Api PRs #155 and #157. They have passed the current API CI, Docker and PostgreSQL migration checks, but are **not merged**. The current `main` branch remains the source of truth until the PRs merge in order.
+**Implementation state:** The canonical permission catalogue and persisted tenant-role administration are merged into HeapCare.Api `main`: PR #155 at `062a16bf76ad8973a60674eb1b8b19403d61347f` and PR #157 at `73f4737ff5c4c36ad29616e306c1fc037a9c40fa`. The dependent role-management workspace is merged into HeapCare.Web `main` in PR #102 at `77c72a90548f88579721bbcd967ac541e1516dcf`. The entries below describe current mainline behavior.
 
 ### Canonical permission catalogue — PR #155
 
@@ -189,7 +189,7 @@ All six existing IPD permissions are registered as non-assignable. No IPD role g
 
 ### Persisted tenant role assignments — PR #157
 
-The proposed migration creates:
+The migration creates:
 
 - `tenant_roles`: tenant-owned system/custom role definitions, stable role codes, active/system status and permission revision.
 - `tenant_role_permissions`: tenant-owned role-to-permission assignments for code-owned permission identifiers.
@@ -199,7 +199,7 @@ The existing membership contract remains one role code per tenant membership. A 
 
 ### Effective permission resolution and administration
 
-The proposed runtime derives permission claims from the active persisted role and permission rows on each tenant-scoped request. Missing roles, inactive roles, empty grants, unknown permission identifiers and permissions invalid for the role type fail closed. Permission changes become effective on the next API request; neither token-supplied role/permission claims nor a process-local cache becomes the source of truth.
+The runtime derives permission claims from the active persisted role and permission rows on each tenant-scoped request. Missing roles, inactive roles, empty grants, unknown permission identifiers and permissions invalid for the role type fail closed. Permission changes become effective on the next API request; neither token-supplied role/permission claims nor a process-local cache becomes the source of truth.
 
 Tenant-wide membership administrators can create, edit, deactivate and reactivate custom role definitions. Role-definition changes require Tenant scope because the role definition is shared by the entire customer Tenant. Hospital- and department-scoped administrators cannot change a Tenant-wide role definition.
 
@@ -218,4 +218,4 @@ System roles cannot be edited, demoted or deactivated. Role rows cannot be physi
 - IPD permissions remain non-assignable and ungranted pending the separate IPD role/workflow approval.
 - PlatformOperator remains a separate global identity; it receives no implicit tenant clinical access.
 
-**Current branch caution:** until PR #155 merges, PR #157 merges after it, and the dependent Web PR #102 is accepted, the persisted role-management experience is not available from `main`.
+**Current main status:** API PRs #155 and #157 and Web PR #102 are merged. Persisted tenant role definitions, permission assignments and the role-management workspace are available on their respective `main` branches. All six IPD permissions remain non-assignable and ungranted pending the separate hospital policy and role/scope approval.
