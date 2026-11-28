@@ -65,10 +65,10 @@ FacilitySite scope is not part of M2 until ADR-019 and HeapCare.Doc #198 are acc
 
 For every existing TenantMembership:
 
-- Create exactly one MembershipRoleAssignment with its current Role.
-- Copy the exact current IsActive state into the new lifecycle mapping.
-- Copy every existing Tenant/Hospital/Department scope to the assignment scope table.
-- Preserve membership Id, TenantId, issuer, subject, old Role and old scopes during compatibility.
+- Create exactly one **Active** MembershipRoleAssignment with its current Role.
+- Copy every existing Tenant/Hospital/Department scope to that assignment's scope table, with exact parent identifiers.
+- Preserve membership Id, TenantId, issuer, subject, legacy Role and legacy scopes during the compatibility period.
+- Keep membership lifecycle independent from assignment lifecycle. An inactive legacy membership receives an Active assignment but remains denied because authorization requires the membership itself to be Active. Reactivating that membership restores only assignments that remain Active and effective; Revoked or Expired assignments stay denied. Do not translate reversible membership deactivation into assignment revocation.
 - Do not infer additional roles, sites, hospitals or permissions.
 - Compare effective permission/scope outcomes before and after migration; any changed access is a blocker.
 
