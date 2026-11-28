@@ -1246,12 +1246,11 @@ API issue #156, “Implement persisted tenant roles and permission assignments,�
 
 ### Phase 5 — actual browser flow for role management
 
-HeapCare.Web PR #103 adds a real-Keycloak Playwright scenario using the synthetic Tenant A HospitalAdmin to open the Roles & permissions workspace, create a custom role with an audit reason, add a delegated facility permission, and deactivate/reactivate the unassigned role with reasons. This supplements the existing component tests and Local API acceptance with an authenticated UI journey.
+HeapCare.Web PR #103 added a real-Keycloak Playwright scenario using the synthetic Tenant A HospitalAdmin to open the Roles & permissions workspace, create a custom role with an audit reason, add a delegated facility permission, and deactivate/reactivate the unassigned role with reasons. It supplements the existing component tests and Local API acceptance with an authenticated UI journey.
 
-- PR: [HeapCare.Web #103](https://github.com/HeapCare/HeapCare.Web/pull/103)
-- Branch: `phase5/real-oidc-tenant-role-workspace`
-- Head: `fc1f66348039a238a89330ba63cf47c92eb71859`
-- Status at this checkpoint: open; Web CI is validating the new suite. The exact Local Chromium/Firefox/WebKit replay is required after this Web change merges.
+- PR: [HeapCare.Web #103](https://github.com/HeapCare/HeapCare.Web/pull/103), merged as `3134b8bf9bb65a0d8dbeafa521c8ec10220038e5`.
+- Exact-head Web CI run [#46158890530](https://github.com/HeapCare/HeapCare.Web/actions/runs/46158890530) passed build/test and the Firefox/WebKit accessibility jobs.
+- HeapCare.Local PR #50 now triggers the full nine-service, real-Keycloak replay against this merged Web main; Local head `4478fed4b22cb57a11e9ba3d1e60c1920f49837f`, run #494 is queued as this checkpoint is written. The real browser lifecycle must be treated as accepted only after that exact Local run passes.
 
 ### Unchanged gates
 
