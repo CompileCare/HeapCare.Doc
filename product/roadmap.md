@@ -1244,6 +1244,17 @@ The canonical permission catalogue, persisted role administration, Web managemen
 
 API issue #156, “Implement persisted tenant roles and permission assignments,” was closed as completed after this evidence was merged. No production identity integration or provider deployment was part of the acceptance.
 
+### Additional Phase 3 cross-tenant RBAC verification — merged 2026-11-28
+
+HeapCare.Api PR #158 merged as `83d15b792c5671cf55361ad35414d6f5204c9c83`. It adds a PostgreSQL-backed HTTP integration test proving a custom role owned by Tenant A:
+- Is not returned in Tenant B's role catalogue.
+- Cannot be assigned by Tenant B to a new membership; the attempted membership is not persisted.
+- Cannot be updated, deactivated or reactivated by Tenant B; each operation returns a non-disclosing 404.
+- Retains its original name, active state, permission revision and exact grant set after the rejected calls.
+- Retains only its original Tenant A creation audit entry; Tenant B's denied attempts create no mutation/audit side effect.
+
+Exact-head API CI [#46160914047](https://github.com/HeapCare/HeapCare.Api/actions/runs/46160914047) passed **12/12 unit tests and 275/275 PostgreSQL integration tests**, Release build and EF model-drift checks. Docker Integration Verification [#46160914084](https://github.com/HeapCare/HeapCare.Api/actions/runs/46160914084) passed, including isolated container and volume cleanup. This is test-only; no API runtime, schema, migration or permission grant changed.
+
 ### Phase 5 — actual browser flow for role management
 
 HeapCare.Web PR #103 added a real-Keycloak Playwright scenario using the synthetic Tenant A HospitalAdmin to open the Roles & permissions workspace, create a custom role with an audit reason, add a delegated facility permission, and deactivate/reactivate the unassigned role with reasons. It supplements the existing component tests and Local API acceptance with an authenticated UI journey.
