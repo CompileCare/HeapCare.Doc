@@ -1250,7 +1250,8 @@ HeapCare.Web PR #103 added a real-Keycloak Playwright scenario using the synthet
 
 - PR: [HeapCare.Web #103](https://github.com/HeapCare/HeapCare.Web/pull/103), merged as `3134b8bf9bb65a0d8dbeafa521c8ec10220038e5`.
 - Exact-head Web CI run [#46158890530](https://github.com/HeapCare/HeapCare.Web/actions/runs/46158890530) passed build/test and the Firefox/WebKit accessibility jobs.
-- HeapCare.Local PR #50 now triggers the full nine-service, real-Keycloak replay against this merged Web main; Local head `4478fed4b22cb57a11e9ba3d1e60c1920f49837f`, run #494 is queued as this checkpoint is written. The real browser lifecycle must be treated as accepted only after that exact Local run passes.
+- The first Local browser replay found a strict-mode ambiguity because both the shell `h1` and workspace `h2` use the same accessible heading text; the authenticated route rendered correctly, and the failure occurred before create/edit/lifecycle actions. Web PR #104 scoped the assertion to the role component region and merged as `32e00251cfaef8b06d1e2d18c5b74adf8e3bcac4`; exact-head Web CI run [#46159723577](https://github.com/HeapCare/HeapCare.Web/actions/runs/46159723577) passed all three jobs.
+- HeapCare.Local PR #50 was refreshed to retest current Web main. Local head `8a1fb69c068f945a25dc6587b2ded35ba8f94e82`, exact-head full-stack run [#46159955402](https://github.com/HeapCare/HeapCare.Local/actions/runs/46159955402) is in progress at this checkpoint. The browser lifecycle remains unaccepted until this replay passes.
 
 ### Unchanged gates
 
