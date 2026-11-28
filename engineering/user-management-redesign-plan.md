@@ -107,7 +107,9 @@ Exact-head evidence:
 
 PR #163 remains draft and unmerged.
 
-**Increment 3 — assignment-aware evaluator:** [HeapCare.Api PR #164](https://github.com/HeapCare/HeapCare.Api/pull/164), branch `feature/m2-assignment-aware-scope-evaluator`, is in draft review with CI running. It adds permission-and-scope checks that require both to exist on the same assignment, while preserving current Tenant/Hospital/Department behavior. It does not wire the evaluator into API services.
+**Increment 3 — assignment-aware evaluator and list scope projection:** [HeapCare.Api PR #164](https://github.com/HeapCare/HeapCare.Api/pull/164), branch `feature/m2-assignment-aware-scope-evaluator`, latest head `8c3ddde054dec078f67475e7fc56ba3776ab3132`. It adds permission-and-scope checks that require both to exist on the same assignment, plus `GetAuthorizedScopes(permissionCodes)` for list queries. The projection includes scopes only from individual assignments that grant every requested permission; it does not let scopes from one assignment satisfy permissions from another. This PR remains draft, its latest exact-head CI is running, and it does not wire the evaluator into existing API services.
+
+**Consumer migration plan:** [assignment-aware consumer migration plan](assignment-aware-consumer-migration-plan.md) records the 13 known service consumers, route permission mapping, query-filter/resource-check requirements, migration order and negative/positive test matrix. Consumer migration has not started; no existing authorization path has been switched.
 
 **Still outstanding in M2:**
 
