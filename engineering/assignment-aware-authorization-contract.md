@@ -85,9 +85,12 @@ Replace the single-role authorization context with an immutable request-local co
 
 Do not expose one flattened scope list as a security authority. Do not flatten permissions and scopes separately. 
 
-**Implementation progress (draft, dependent on HeapCare.Api #162):** HeapCare.Api [PR #163](https://github.com/HeapCare/HeapCare.Api/pull/163) adds a data-only `ITenantRoleAssignmentContext`. The membership reader loads only active, currently effective assignments whose TenantRole is active and whose own permission grants pass the canonical permission-catalogue validation. Each snapshot retains its own role, permissions and scope rows. Middleware populates this snapshot alongside the current legacy membership context.
+**Implementation progress — dependent draft PR chain:**
 
-This increment deliberately adds **no authorization methods** to the new context and changes no route policy, claim, service-level scope check or clinical permission. The current legacy authorization remains authoritative until the scope policy is approved and every consumer is migrated. Keep the snapshot out of authorization decisions until that follow-up is complete.
+- [HeapCare.Api PR #163](https://github.com/HeapCare/HeapCare.Api/pull/163) adds a data-only `ITenantRoleAssignmentContext`. The membership reader loads only active, currently effective assignments whose TenantRole is active and whose own permission grants pass canonical catalogue validation. Each assignment retains its own role, permissions and scope rows. Middleware populates this snapshot alongside the legacy membership context. Exact-head API CI passed 16 unit + 278 integration tests and the PostgreSQL migration rehearsal passed. Docker validation is deferred until this dependent PR is retargeted to `main`.
+- [HeapCare.Api PR #164](https://github.com/HeapCare/HeapCare.Api/pull/164) adds opt-in methods that check the requested permission and resource scope on the same assignment. It mirrors current Tenant/Hospital/Department behavior for compatibility and includes tests for scope-borrowing denial. This PR is draft and its CI is pending.
+
+Neither PR changes existing API authorization behavior. Existing route policies and services continue using the legacy membership context until every consumer is migrated and the compatibility matrix is reviewed. No clinical permission or TenantAdmin grant has been changed.
 
 
 ### Required authorization API semantics
