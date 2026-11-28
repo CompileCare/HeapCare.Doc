@@ -92,6 +92,8 @@ Do not expose one flattened scope list as a security authority. Do not flatten p
 
 Neither PR changes existing API authorization behavior. Existing route policies and services continue using the legacy membership context until every consumer is migrated and the compatibility matrix is reviewed. No clinical permission or TenantAdmin grant has been changed.
 
+The [assignment-aware consumer migration plan](assignment-aware-consumer-migration-plan.md) records the known 13 scope-consuming services, route permission codes, operation-specific list filters, migration order, parity gates and positive/negative tests. PR #164 now also includes `GetAuthorizedScopes(permissionCodes)`: only scopes from an individual assignment that grants every requested permission may contribute to a list-query filter.
+
 
 ### Required authorization API semantics
 
