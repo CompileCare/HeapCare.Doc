@@ -65,10 +65,10 @@ FacilitySite scope is not part of M2 until ADR-019 and HeapCare.Doc #198 are acc
 
 For every existing TenantMembership:
 
-- Create exactly one MembershipRoleAssignment with its current Role.
-- Copy the exact current IsActive state into the new lifecycle mapping.
-- Copy every existing Tenant/Hospital/Department scope to the assignment scope table.
-- Preserve membership Id, TenantId, issuer, subject, old Role and old scopes during compatibility.
+- Create exactly one **Active** MembershipRoleAssignment with its current Role.
+- Copy every existing Tenant/Hospital/Department scope to that assignment's scope table, with exact parent identifiers.
+- Preserve membership Id, TenantId, issuer, subject, legacy Role and legacy scopes during the compatibility period.
+- Keep membership lifecycle independent from assignment lifecycle. An inactive legacy membership receives an Active assignment but remains denied because authorization requires the membership itself to be Active. Reactivating that membership restores only assignments that remain Active and effective; Revoked or Expired assignments stay denied. Do not translate reversible membership deactivation into assignment revocation.
 - Do not infer additional roles, sites, hospitals or permissions.
 - Compare effective permission/scope outcomes before and after migration; any changed access is a blocker.
 
@@ -83,7 +83,17 @@ Replace the single-role authorization context with an immutable request-local co
 - The permission codes currently granted by that role.
 - The exact scope rows attached to that assignment.
 
-Do not expose one flattened scope list as a security authority. Do not flatten permissions and scopes separately.
+Do not expose one flattened scope list as a security authority. Do not flatten permissions and scopes separately. 
+
+**Implementation progress — dependent draft PR chain:**
+
+- [HeapCare.Api PR #163](https://github.com/HeapCare/HeapCare.Api/pull/163) adds a data-only `ITenantRoleAssignmentContext`. The membership reader loads only active, currently effective assignments whose TenantRole is active and whose own permission grants pass canonical catalogue validation. Each assignment retains its own role, permissions and scope rows. Middleware populates this snapshot alongside the legacy membership context. Exact-head API CI passed 16 unit + 278 integration tests and the PostgreSQL migration rehearsal passed. Docker validation is deferred until this dependent PR is retargeted to `main`.
+- [HeapCare.Api PR #164](https://github.com/HeapCare/HeapCare.Api/pull/164) adds opt-in methods that check the requested permission and resource scope on the same assignment, plus permission-specific list-scope projection. It mirrors current Tenant/Hospital/Department behavior for compatibility and includes scope-borrowing, compound-permission and fail-closed tests. Exact-head API CI [#46180242306](https://github.com/HeapCare/HeapCare.Api/actions/runs/46180242306) passed 22/22 unit and 278/278 PostgreSQL integration tests, plus build and EF model-drift guard. Its separate Docker Integration Verification workflow did not trigger because the PR targets a dependent feature branch rather than main; run it after retargeting. This PR remains draft.
+
+Neither PR changes existing API authorization behavior. Existing route policies and services continue using the legacy membership context until every consumer is migrated and the compatibility matrix is reviewed. No clinical permission or TenantAdmin grant has been changed.
+
+The [assignment-aware consumer migration plan](assignment-aware-consumer-migration-plan.md) records the known 13 scope-consuming services, route permission codes, operation-specific list filters, migration order, parity gates and positive/negative tests. PR #164 now also includes `GetAuthorizedScopes(permissionCodes)`: only scopes from an individual assignment that grants every requested permission may contribute to a list-query filter.
+
 
 ### Required authorization API semantics
 
