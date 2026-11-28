@@ -9,7 +9,8 @@
 ## GitHub tracking
 
 - **Architecture epic:** [HeapCare.Doc #228](https://github.com/HeapCare/HeapCare.Doc/issues/228)
-- **Compatibility inventory:** [engineering/user-management-compatibility-inventory.md](user-management-compatibility-inventory.md) — initial API/Web dependency map; exhaustive search and final resolver contract remain M0 gates.
+- **Compatibility inventory:** [engineering/user-management-compatibility-inventory.md](user-management-compatibility-inventory.md) — API/Web dependency map for current identity, role, scope and authorization consumers.
+- **M2 authorization contract:** [engineering/assignment-aware-authorization-contract.md](assignment-aware-authorization-contract.md) — permission and resource scope must be evaluated together on the same active role assignment.
 - **API identity and role-assignment migration:** [HeapCare.Api #159](https://github.com/HeapCare/HeapCare.Api/issues/159)
 - **API identity lifecycle and invitations:** [HeapCare.Api #160](https://github.com/HeapCare/HeapCare.Api/issues/160)
 - **Web administration workflows:** [HeapCare.Web #110](https://github.com/HeapCare/HeapCare.Web/issues/110)
@@ -47,7 +48,7 @@ This is a local-first engineering initiative. Do not select/configure production
 - [ ] Merge ADR-020 and this execution plan after review.
 - [x] Create linked implementation issues in the affected repositories.
 - [ ] Inventory every use of legacy membership Role and membership-level scopes.
-- [ ] Define and record invariants and the privilege-preserving backfill contract.
+- [x] Define the initial assignment-aware authorization invariant and privilege-preserving backfill contract in the M2 design document.
 
 **Exit:** approved target model, reader/writer inventory, test plan and migration/rollback design exist before runtime schema changes.
 
