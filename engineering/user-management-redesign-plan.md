@@ -40,7 +40,7 @@ This is a local-first engineering initiative. Do not select/configure production
 
 ### M0 — Architecture and migration baseline
 
-**Status: In progress (documentation branch).**
+**Status: Source-backed baseline documented; final discovery remains continuous.**
 
 - [x] Inspect current API identity, membership, scope, role, permission and platform-operator implementation.
 - [x] Inspect current Web feature areas for membership and platform administration.
@@ -51,20 +51,25 @@ This is a local-first engineering initiative. Do not select/configure production
 - [ ] Inventory every use of legacy membership Role and membership-level scopes.
 - [x] Define the initial assignment-aware authorization invariant and privilege-preserving backfill contract in the M2 design document.
 
-**Exit:** approved target model, reader/writer inventory, test plan and migration/rollback design exist before runtime schema changes.
+**Exit:** proposed target model, source-backed reader/writer inventory, route/permission matrix and migration/backfill invariants are documented. ADR-020 and M2 contract remain proposed pending product/security review. Keep the inventory current whenever new endpoints or services are added.
 
 ### M1 — Global identity registry and membership association
 
+**Status: API implementation merged; Local real-Keycloak acceptance pending.**
+
+**Evidence:** HeapCare.Api PR #161 merged as `7adf40d014582f29d1a88bb80fd60ddcc2b702f8`. Exact-head API CI run [#46171317470](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317470) passed 12/12 unit tests and 276/276 PostgreSQL integration tests plus EF model-drift guard. Docker Integration Verification [#46171317462](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317462) passed. PostgreSQL Migration Rehearsal [#46171317451](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317451) passed populated upgrade and fresh installation.
+
 **Repositories:** HeapCare.Api; HeapCare.Local.
 
-- Add UserIdentity keyed by normalized validated OIDC issuer + subject.
-- Add an explicit identity-to-membership relationship.
+- [x] Add UserIdentity keyed by validated OIDC issuer + subject.
+- [x] Add explicit identity links from TenantMembership and PlatformOperator.
 - Preserve current identity mappings; never merge by email.
 - Keep current issuer/subject columns temporarily for compatibility and diagnostics.
-- Add uniqueness, foreign-key and lifecycle constraints.
-- Test existing one-tenant and multi-tenant identities, duplicate identity rows, unknown/inactive identities and tenant boundary violations.
+- [x] Add unique issuer/subject, composite identity foreign keys and restrictive delete constraints.
+- [x] Test existing identity backfill, multi-tenant identity reuse and distinct issuer handling in PostgreSQL.
+- [ ] Complete Local real-Keycloak acceptance, including one principal linked to tenant membership and the PlatformOperator registry.
 
-**Exit:** all current memberships backfill to exactly one identity; all existing authentication and user-tenant discovery tests pass.
+**Exit:** API migration and unit/integration acceptance are merged; M1 is not fully complete until Local real-Keycloak acceptance passes.
 
 ### M2 — Multiple scoped role assignments
 
