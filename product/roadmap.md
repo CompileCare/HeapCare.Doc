@@ -11,6 +11,15 @@ HeapCare is a hospital and healthcare information/management platform. This road
 - **Mobile and OTP:** the current delivery is web-first. Mobile application planning and OTP login are deferred until the web version is complete. Do not add mock OTP flows or treat the current OTP service scaffold as production-ready. Before any mobile OTP implementation, complete its credential-rotation/revocation and security, provider, key-management, abuse-control, privacy and tenant/patient binding gates.
 - **Accessibility acceptance:** manual sign-off is tracked in HeapCare.Doc issue #201. The agreed combinations are Windows 11 + Chrome + NVDA; Windows 11 + Firefox + NVDA; Windows 11 + Edge + JAWS; macOS + Safari + VoiceOver; macOS + Chrome + VoiceOver; and Ubuntu Linux + Firefox keyboard-only. Brave receives a separate Chromium-family smoke check. Target WCAG 2.2 Level AA. Automated browser checks are supporting regression evidence, not manual AT or conformance sign-off. Web PR #100 is merged and CI run #46100412610 passed the existing Chromium suite plus public accessibility smoke tests in Playwright Firefox and WebKit on Ubuntu; this adds engine-level regression coverage only and does not complete the OS/browser/screen-reader matrix.
 
+
+## User-management architecture redesign — started 2026-11-28
+
+The existing OIDC, tenant registry, memberships, persisted roles/permissions and organization-scope controls are retained as the security foundation. A proposed redesign is documented in [ADR-020](../architecture/decisions/ADR-020-user-identity-membership-and-scoped-role-assignments.md), with the implementation sequence in the [user-management redesign plan](../engineering/user-management-redesign-plan.md).
+
+The target introduces a global identity registry, tenant memberships independent of roles, multiple role assignments with scopes owned by each assignment, a dedicated TenantAdmin role, provider-neutral identity lifecycle/invitations and auditable lifecycle states. Runtime schema and authorization changes have **not** started in this documentation increment. M0 is active; M1-M6 are planned and gated on the compatibility inventory, permission decisions and migration design. Existing memberships must preserve exactly their current effective role and scopes.
+
+A separately permissioned, read-only tenant/hospital portfolio overview for a designated platform owner is recorded as **low priority**. It must expose only approved organization metadata, never patient/clinical records or tenant write/impersonation access, and is excluded from the M0-M6 critical path.
+
 ## Phase 1 — Backend foundation
 
 **Status: Completed and merged**

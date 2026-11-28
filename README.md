@@ -29,6 +29,9 @@ HeapCare is an India-focused hospital information and management platform for ho
 - [IPD role and workflow approval worksheet](product/decisions/ipd-role-and-workflow-approval-worksheet.md) — hospital sign-off template; all IPD role grants remain closed pending approval.
 - [ADR-018: IPD ADT and bed-management boundaries](architecture/decisions/ADR-018-inpatient-ADT-bed-management-boundaries.md) — accepted initial scope; detailed admission rules and role permissions remain open.
 - [ADR-019: Facility-site model and scope inheritance](architecture/decisions/ADR-019-facility-site-model-and-scope-inheritance.md) — proposed design only; not accepted for implementation.
+- [ADR-020: User identity, tenant membership and scoped role assignments](architecture/decisions/ADR-020-user-identity-membership-and-scoped-role-assignments.md) — proposed target architecture; preserve existing tenant isolation and migrate memberships without privilege expansion.
+- [User-management redesign execution plan](engineering/user-management-redesign-plan.md) — milestones, repository responsibilities, migration sequence, blockers and low-priority platform portfolio visibility.
+- [User-management compatibility inventory](engineering/user-management-compatibility-inventory.md) — current API/Web identity, membership, role, scope and authorization dependencies to migrate safely.
 - [ADR-014: Appointment scheduling and queue boundaries](architecture/decisions/ADR-014-appointment-scheduling-and-queue-boundaries.md)
 - [ADR-013: Staff and provider profile boundaries](architecture/decisions/ADR-013-staff-and-provider-profile-boundaries.md)
 - [ADR-012: Verified patient contact data](architecture/decisions/ADR-012-verified-patient-contact-data-and-matching.md)
