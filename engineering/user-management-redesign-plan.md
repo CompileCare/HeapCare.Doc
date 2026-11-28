@@ -107,9 +107,15 @@ Exact-head evidence:
 
 PR #163 remains draft and unmerged.
 
-**Increment 3 — assignment-aware evaluator and list scope projection:** [HeapCare.Api PR #164](https://github.com/HeapCare/HeapCare.Api/pull/164), branch `feature/m2-assignment-aware-scope-evaluator`, latest head `8c3ddde054dec078f67475e7fc56ba3776ab3132`. It adds permission-and-scope checks that require both to exist on the same assignment, plus `GetAuthorizedScopes(permissionCodes)` for list queries. The projection includes scopes only from individual assignments that grant every requested permission; it does not let scopes from one assignment satisfy permissions from another. This PR remains draft, its latest exact-head CI is running, and it does not wire the evaluator into existing API services.
+**Increment 3 — assignment-aware evaluator and list scope projection:** [HeapCare.Api PR #164](https://github.com/HeapCare/HeapCare.Api/pull/164), branch `feature/m2-assignment-aware-scope-evaluator`, validated head `8c3ddde054dec078f67475e7fc56ba3776ab3132`.
 
-**Consumer migration plan:** [assignment-aware consumer migration plan](assignment-aware-consumer-migration-plan.md) records the 13 known service consumers, route permission mapping, query-filter/resource-check requirements, migration order and negative/positive test matrix. Consumer migration has not started; no existing authorization path has been switched.
+- Adds Tenant/Hospital/Department resource checks that require the permission and matching scope on the same assignment, preserving current legacy scope inheritance for the compatibility period.
+- Adds `GetAuthorizedScopes(permissionCodes)` for list-query filters. Scopes contribute only from assignments that grant every requested permission; permissions cannot be borrowed across assignments.
+- [API CI #46180242306](https://github.com/HeapCare/HeapCare.Api/actions/runs/46180242306): Release restore/build and EF model-drift guard passed; 22/22 unit tests and 278/278 PostgreSQL integration tests passed.
+- PR #164 remains draft. The separate Docker Integration Verification workflow did not trigger because the dependent PR targets a feature branch, not `main`; run it after the branch chain is retargeted to main.
+- The evaluator is not wired into existing API services or route policies.
+
+**Consumer migration plan:** [assignment-aware consumer migration plan](assignment-aware-consumer-migration-plan.md) records the 13 known service consumers, route permission mapping, permission-specific list-query/resource-check requirements, migration order and negative/positive test matrix. Consumer migration has not started; no existing authorization path has been switched.
 
 **Still outstanding in M2:**
 
