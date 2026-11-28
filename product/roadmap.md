@@ -1223,3 +1223,52 @@ HeapCare.Api PR #150 merged as `4b07eb11c5063288751e1e8a507ce9dc31aafda3`. Postg
 Exact-head checks passed Release build, EF model-drift guard, 12/12 unit tests, 257/257 PostgreSQL integration tests, Docker Integration Verification and the additional build/test workflow. The only database error logs are the two expected synthetic failure injections.
 
 This verifies IPD bed-operation audit transaction failure handling, complementing API PR #148 success-path audit verification and #138/#146 denied-path audit verification. No runtime, schema, migration, role-grant or hospital-policy change was made. All six IPD permission identifiers remain ungranted.
+
+## Tenant-persisted RBAC acceptance and role-workspace browser follow-up — 2026-11-28
+
+### Phase 3 — persisted roles and permission assignments completed
+
+The canonical permission catalogue, persisted role administration, Web management workspace and Local real-Keycloak acceptance are merged:
+
+- HeapCare.Api PR #155 — canonical permission catalogue and exact current system-role grants; merge commit `062a16bf76ad8973a60674eb1b8b19403d61347f`.
+- HeapCare.Api PR #157 — tenant-persisted system/custom roles and permission rows, compatibility backfill, fail-closed request-time permission resolution, delegation checks, immutable system roles, append-only before/after audit history, active-role membership validation and membership-reactivation revalidation; merge commit `73f4737ff5c4c36ad29616e306c1fc037a9c40fa`.
+- HeapCare.Web PR #102 — role/permission administration workspace with delegated permission selection and reasoned role lifecycle actions; merge commit `77c72a90548f88579721bbcd967ac541e1516dcf`.
+- HeapCare.Doc PR #225 — permission matrix and authorization-policy inventory reconciled with the merged implementation; merge commit `e5fd64f4cf2367ec0543ce9c479e01635ccf87ea`.
+- HeapCare.Local PR #49 — real-Keycloak custom-role acceptance; merge commit `d0228d78eb735599323fce7770e71de9e26a297d`.
+
+**Exact Local validation:** workflow run [#46158083003](https://github.com/HeapCare/HeapCare.Local/actions/runs/46158083003) completed successfully on PR #49 head `6d1840ac40d7ad507545f480330572fca94d1173`. Both the full nine-service stack job and the tooling/observability validation job passed. It verified:
+- Real Keycloak-issued tenant identities, baseline roles, persisted custom-role create and membership assignment, exact effective permissions, permission edits taking effect on the next request, and inactive-role membership reactivation being denied until the role is restored.
+- A delegated custom membership administrator cannot create a role with permissions outside their grant set or use a gated IPD permission.
+- The protected `membership.role.assign.system` permission and all six IPD permission identifiers remain excluded from the assignable catalogue.
+- PostgreSQL logical backup and isolated restore; real Authorization Code + PKCE browser acceptance on Chromium; authenticated six-role accessibility baselines on Firefox and WebKit; stack and CI-secret cleanup.
+
+API issue #156, “Implement persisted tenant roles and permission assignments,” was closed as completed after this evidence was merged. No production identity integration or provider deployment was part of the acceptance.
+
+### Additional Phase 3 cross-tenant RBAC verification — merged 2026-11-28
+
+HeapCare.Api PR #158 merged as `83d15b792c5671cf55361ad35414d6f5204c9c83`. It adds a PostgreSQL-backed HTTP integration test proving a custom role owned by Tenant A:
+- Is not returned in Tenant B's role catalogue.
+- Cannot be assigned by Tenant B to a new membership; the attempted membership is not persisted.
+- Cannot be updated, deactivated or reactivated by Tenant B; each operation returns a non-disclosing 404.
+- Retains its original name, active state, permission revision and exact grant set after the rejected calls.
+- Retains only its original Tenant A creation audit entry; Tenant B's denied attempts create no mutation/audit side effect.
+
+Exact-head API CI [#46160914047](https://github.com/HeapCare/HeapCare.Api/actions/runs/46160914047) passed **12/12 unit tests and 275/275 PostgreSQL integration tests**, Release build and EF model-drift checks. Docker Integration Verification [#46160914084](https://github.com/HeapCare/HeapCare.Api/actions/runs/46160914084) passed, including isolated container and volume cleanup. This is test-only; no API runtime, schema, migration or permission grant changed.
+
+### Phase 5 — actual browser flow for role management
+
+HeapCare.Web PR #103 added a real-Keycloak Playwright scenario using the synthetic Tenant A HospitalAdmin to open the Roles & permissions workspace, create a custom role with an audit reason, add a delegated facility permission, and deactivate/reactivate the unassigned role with reasons. It supplements the existing component tests and Local API acceptance with an authenticated UI journey.
+
+- PR: [HeapCare.Web #103](https://github.com/HeapCare/HeapCare.Web/pull/103), merged as `3134b8bf9bb65a0d8dbeafa521c8ec10220038e5`.
+- Exact-head Web CI run [#46158890530](https://github.com/HeapCare/HeapCare.Web/actions/runs/46158890530) passed build/test and the Firefox/WebKit accessibility jobs.
+- The first Local browser replay found a strict-mode ambiguity because both the shell `h1` and workspace `h2` use the same accessible heading text; the authenticated route rendered correctly, and the failure occurred before create/edit/lifecycle actions. Web PR #104 scoped the assertion to the role component region and merged as `32e00251cfaef8b06d1e2d18c5b74adf8e3bcac4`; exact-head Web CI run [#46159723577](https://github.com/HeapCare/HeapCare.Web/actions/runs/46159723577) passed all three jobs.
+- Local run [#46160730471](https://github.com/HeapCare/HeapCare.Local/actions/runs/46160730471) passed the nine-service stack, real-Keycloak custom-role API acceptance, PostgreSQL restore and Chromium role create/edit/deactivate/reactivate journey. Its later Firefox/WebKit stage failed because the same state-changing role lifecycle test ran a second time against the shared tenant database and created duplicate role cards; the six-role read-only cases are not the source of the failure.
+- Web PR #107 adds a Playwright skip for this state-changing scenario on non-Chromium engines while retaining the six-role Firefox/WebKit accessibility baselines. It merged as `3d0c7e0cda2c62fc310e17e1f562e1fbffa2d7f4`; exact-head Web CI [#46161797317](https://github.com/HeapCare/HeapCare.Web/actions/runs/46161797317) passed all three jobs.
+- Local PR #50 now documents the corrected browser matrix on head `baf7398a0044ce7d7104952057f64d9d0fd41d0d`: the mutating role lifecycle runs on Chromium only, while Firefox and WebKit retain the six-role read-only baseline. Local workflow run [#46162297400](https://github.com/HeapCare/HeapCare.Local/actions/runs/46162297400) is running on that exact head; the full-stack job and tooling validation must both complete successfully, including PostgreSQL restore and cleanup, before PR #50 can merge or this browser lifecycle be marked accepted. The earlier Web PR #108/#109 attempts were closed as unnecessary after the existing PR #107 Chromium-only guard was confirmed to address the shared-database collision.
+
+### Unchanged gates
+
+- IPD remains policy-gated by HeapCare.Doc #200. All six IPD permission identifiers remain non-assignable and ungranted; no positive IPD workflow or discharge/cancellation policy is inferred.
+- Branch, site and clinic modeling remains pending product/hospital operational agreement in HeapCare.Doc #198. Do not create a FacilitySite schema or additional inherited scope until approved.
+- Native assistive-technology testing and qualified WCAG 2.2 AA review remain open in HeapCare.Doc #201. Chromium/Firefox/Playwright WebKit are not substitutes for NVDA, JAWS, VoiceOver or the native OS combinations in that issue.
+- Production identity, secret/key custody, provider-native PITR/DR and deployment decisions remain deferred under HeapCare.Doc #197. This execution remains local-first.
