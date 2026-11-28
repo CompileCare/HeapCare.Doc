@@ -11,6 +11,7 @@
 - **Architecture epic:** [HeapCare.Doc #228](https://github.com/HeapCare/HeapCare.Doc/issues/228)
 - **Compatibility inventory:** [engineering/user-management-compatibility-inventory.md](user-management-compatibility-inventory.md) — API/Web dependency map for current identity, role, scope and authorization consumers.
 - **M2 authorization contract:** [engineering/assignment-aware-authorization-contract.md](assignment-aware-authorization-contract.md) — permission and resource scope must be evaluated together on the same active role assignment.
+- **Current operation/permission map:** [engineering/operation-permission-route-matrix.md](operation-permission-route-matrix.md) — endpoint-level route policies and canonical permission codes across the existing API modules.
 - **API identity and role-assignment migration:** [HeapCare.Api #159](https://github.com/HeapCare/HeapCare.Api/issues/159)
 - **API identity lifecycle and invitations:** [HeapCare.Api #160](https://github.com/HeapCare/HeapCare.Api/issues/160)
 - **Web administration workflows:** [HeapCare.Web #110](https://github.com/HeapCare/HeapCare.Web/issues/110)
