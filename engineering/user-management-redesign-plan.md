@@ -6,6 +6,16 @@
 **Architecture decision:** [ADR-020 — User Identity, Tenant Membership and Scoped Role Assignments](../architecture/decisions/ADR-020-user-identity-membership-and-scoped-role-assignments.md).  
 **Related tracked work:** HeapCare.Doc #198 (facility sites), #197 (deferred production readiness).
 
+## GitHub tracking
+
+- **Architecture epic:** [HeapCare.Doc #228](https://github.com/HeapCare/HeapCare.Doc/issues/228)
+- **API identity and role-assignment migration:** [HeapCare.Api #159](https://github.com/HeapCare/HeapCare.Api/issues/159)
+- **API identity lifecycle and invitations:** [HeapCare.Api #160](https://github.com/HeapCare/HeapCare.Api/issues/160)
+- **Web administration workflows:** [HeapCare.Web #110](https://github.com/HeapCare/HeapCare.Web/issues/110)
+- **Local real-Keycloak and migration acceptance:** [HeapCare.Local #51](https://github.com/HeapCare/HeapCare.Local/issues/51)
+- **FacilitySite dependency:** [HeapCare.Doc #198](https://github.com/HeapCare/HeapCare.Doc/issues/198)
+- **Portfolio overview:** documented low-priority requirement in ADR-020; intentionally not an implementation issue in the current critical path.
+
 ## Objective
 
 Evolve HeapCare's existing OIDC, tenant membership and persisted RBAC foundation so one identity can belong to multiple healthcare organizations and hold multiple independently scoped roles within each organization. Preserve tenant isolation and current effective access during migration.
