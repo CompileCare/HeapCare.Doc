@@ -1,6 +1,6 @@
 # API authorization policy inventory
 
-**Status:** Source-derived inventory, updated 2026-11-28; persisted role administration is under review in HeapCare.Api PR #157 and is not yet merged.  
+**Status:** Source-derived inventory, updated 2026-11-28; the canonical permission catalogue and persisted tenant-role administration are merged in HeapCare.Api PRs #155 and #157. The role-management workspace is merged in HeapCare.Web PR #102.  
 **Purpose:** Provide a traceable starting point for role-based authorization review and authenticated acceptance. This is not a role-to-permission grant matrix and is not a substitute for tests or a live authorization review.
 
 ## Source of truth and trust model
@@ -83,7 +83,7 @@ The source-derived role matrix now records the merged API PRs #96–#100. In bri
 
 ## Persisted role-administration routes — PR #157 (not yet merged)
 
-The proposed tenant role API is registered under the existing authenticated tenant-scoped route metadata and the `TenantMembershipManage` policy:
+The tenant role API is registered under the existing authenticated tenant-scoped route metadata and the `TenantMembershipManage` policy:
 
 | Operation | Route | Endpoint name |
 |---|---|---|
@@ -94,4 +94,4 @@ The proposed tenant role API is registered under the existing authenticated tena
 | Deactivate a custom role | `POST /api/v1/tenant/roles/{roleId}/deactivate` | `DeactivateTenantRole` |
 | Reactivate a custom role | `POST /api/v1/tenant/roles/{roleId}/reactivate` | `ReactivateTenantRole` |
 
-The endpoint policy is only the first authorization layer. The administration service additionally requires Tenant scope for role-definition changes, rejects non-assignable or unknown permission codes, enforces custom-role grant-subset delegation, protects system roles and appends a before/after audit snapshot with a required reason. These routes are part of open PR #157, not the current `main` endpoint surface.
+The endpoint policy is only the first authorization layer. The administration service additionally requires Tenant scope for role-definition changes, rejects non-assignable or unknown permission codes, enforces custom-role grant-subset delegation, protects system roles and appends a before/after audit snapshot with a required reason. These routes were introduced by API PR #157 and are now part of HeapCare.Api `main`. The associated role-management workspace is available in HeapCare.Web `main` following PR #102.
