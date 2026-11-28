@@ -193,7 +193,7 @@ Local Keycloak configuration:
 
 ## 6. Expanded authorization-consumer map
 
-The following services were inspected directly in HeapCare.Api on 2026-11-28. These consumers currently receive one request-scoped IOrganizationScopeContext and assume its scope collection is the complete authority for the request.
+The following thirteen operational services were inspected directly in HeapCare.Api on 2026-11-28. These consumers currently receive one request-scoped IOrganizationScopeContext and assume its scope collection is the complete authority for the request.
 
 | Service | Current scope-dependent operations | Redesign implication |
 |---|---|---|
@@ -207,6 +207,9 @@ The following services were inspected directly in HeapCare.Api on 2026-11-28. Th
 | StaffManagementService | Staff and assignment filtering plus assignment mutation checks | Staff-read/manage permissions must be paired with the matching hospital/department assignment |
 | InpatientService | Admission visibility, placement history and bed assignment/transfer using scopes and CanManageDepartment | IPD permission and hospital/department assignment must be checked together; preserve all existing fail-closed IPD grants |
 | AuditEventQueryService | Audit-event query/export scope filtering, currently using tenant-wide scope as a broad query boundary | Audit permission and each audit event's organization scope must be checked together |
+| PatientService | Patient search/detail and registration visibility checks using CanAccessDepartment plus tenant/hospital scope | Patient read/register permissions must be bound to the assignment that covers the registered hospital/department |
+| PatientIdentifierService | MRN policy/identifier access bounded by tenant and hospital scope | Identifier read/assign/policy permissions must not inherit scopes from unrelated role assignments |
+| PatientDuplicateDetectionService | Duplicate-candidate visibility is constrained by hospital scope | Duplicate review permission and the matching hospital scope must be granted by the same assignment |
 
 ### Route-level permission checks
 
@@ -218,7 +221,7 @@ This design is correct for the current one-role membership. It is not sufficient
 
 **Required target pattern:** the same role assignment must be the source of both the permission and the resource scope. A request with permission P from Assignment A and a Hospital B scope from Assignment B must be denied against a Hospital B resource unless one and the same active assignment grants P and covers Hospital B. Route policies may remain a fast coarse check, but resource authorization must be assignment-aware and authoritative at the service/resource boundary.
 
-The migration must inventory all policy strings and all service scope calls, then use a common authorization abstraction rather than introducing ad hoc checks in each module.
+The migration must inventory all policy strings and all service scope calls, then use a common authorization abstraction rather than introducing ad hoc checks in each module. The patient-facing consumers are first-class security boundaries; an assignment that grants general patient read in Hospital A must not borrow a Hospital B scope supplied by a different role assignment.
 
 ### Application and infrastructure registration
 
@@ -278,10 +281,10 @@ Existing authorization test surfaces:
 
 ## 8. M0 findings and remaining closure gates
 
-**Completed source mapping:** persisted membership and scope schema; OIDC resolution; request middleware and permission context; role/membership admin services; platform operator identity; primary tenant/membership/role endpoints; current-user context contract; all ten inspected scope-consuming application services; Web membership/role/platform screens; test seed helper and primary test suites.
+**Completed source mapping:** persisted membership and scope schema; OIDC resolution; request middleware and permission context; role/membership admin services; platform operator identity; primary tenant/membership/role endpoints; current-user context contract; all thirteen inspected operational scope-consuming services, including patient search/detail, MRN and duplicate review; Web membership/role/platform screens; test seed helper and primary test suites.
 
 **Remaining M0 gates before M2 authorization refactoring:**
-- Complete a repository-wide reference scan for any additional membership/scope consumers not listed above.
+- Complete a final reference scan for any non-obvious membership/scope consumers outside the inspected API and Infrastructure service set.
 - Record the canonical operation-to-permission map for every service scope check.
 - Specify the assignment-aware authorization API and behavior for overlapping/redundant assignments.
 - Finalize TenantAdmin's organization-only permission set and last-admin/recovery invariants.
