@@ -99,6 +99,8 @@ Implemented in this increment:
 
 PR #162 remains a **draft** and is not merged. The checks validate this additive persistence slice only; they do not establish that the entire M2 authorization redesign is complete.
 
+**Next incremental implementation:** [HeapCare.Api PR #163](https://github.com/HeapCare/HeapCare.Api/pull/163) adds an immutable request-scoped snapshot of active/effective role assignments, retaining each assignment's own permission and scope collections. It is a data-only compatibility increment; current legacy authorization remains authoritative. The PR is draft and its exact-head CI and migration checks are still running.
+
 **Still outstanding in M2:**
 
 - Introduce the immutable assignment-aware request context and one central permission-plus-scope resolver.
