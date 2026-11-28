@@ -55,21 +55,26 @@ This is a local-first engineering initiative. Do not select/configure production
 
 ### M1 — Global identity registry and membership association
 
-**Status: API implementation merged; Local real-Keycloak acceptance pending.**
+**Status: Complete.**
 
-**Evidence:** HeapCare.Api PR #161 merged as `7adf40d014582f29d1a88bb80fd60ddcc2b702f8`. Exact-head API CI run [#46171317470](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317470) passed 12/12 unit tests and 276/276 PostgreSQL integration tests plus EF model-drift guard. Docker Integration Verification [#46171317462](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317462) passed. PostgreSQL Migration Rehearsal [#46171317451](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317451) passed populated upgrade and fresh installation.
+**API evidence:** HeapCare.Api PR #161 merged as `7adf40d014582f29d1a88bb80fd60ddcc2b702f8`. Exact-head API CI run [#46171317470](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317470) passed 12/12 unit tests and 276/276 PostgreSQL integration tests plus the EF model-drift guard. Docker Integration Verification [#46171317462](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317462) passed. PostgreSQL Migration Rehearsal [#46171317451](https://github.com/HeapCare/HeapCare.Api/actions/runs/46171317451) passed populated-database upgrade and fresh installation.
+
+**Integrated Local evidence:** HeapCare.Local PR #52 merged as `111f933f624c8dc0c60b86f18b4f532e2515a53c`. Exact-head full-stack run [#46175082165](https://github.com/HeapCare/HeapCare.Local/actions/runs/46175082165) passed both jobs: nine-service Compose startup/telemetry, real Keycloak-issued identity and persisted multi-tenant acceptance, PostgreSQL logical backup and isolated restore, Chromium Authorization Code + PKCE, Firefox/WebKit six-role accessibility, and cleanup of all ephemeral containers, volumes and CI-only secrets. The real-Keycloak acceptance verified that one issuer/subject can be a PlatformOperator and an explicitly provisioned FacilityViewer in Tenant A, while receiving no Tenant B membership and no patient, clinical or IPD privilege expansion.
+
+**Browser-fixture support:** HeapCare.Web PR #111 merged as `5f874752f230d210d63dcc6a65ac2a7b2a836cfe` to verify the separate PlatformOperator and tenant workspaces. PR #112 merged as `520ec89b048958cf253a5823ee011a6483abdf46` to use the dedicated appointment-cancellation local date in the browser fixture while preserving the original booking date.
 
 **Repositories:** HeapCare.Api; HeapCare.Local.
 
 - [x] Add UserIdentity keyed by validated OIDC issuer + subject.
 - [x] Add explicit identity links from TenantMembership and PlatformOperator.
-- Preserve current identity mappings; never merge by email.
-- Keep current issuer/subject columns temporarily for compatibility and diagnostics.
+- [x] Preserve current identity mappings by exact issuer + subject; never merge by email.
+- [x] Keep current issuer/subject columns temporarily for compatibility and diagnostics.
 - [x] Add unique issuer/subject, composite identity foreign keys and restrictive delete constraints.
 - [x] Test existing identity backfill, multi-tenant identity reuse and distinct issuer handling in PostgreSQL.
-- [ ] Complete Local real-Keycloak acceptance, including one principal linked to tenant membership and the PlatformOperator registry.
+- [x] Complete Local real-Keycloak acceptance, including one principal linked to tenant membership and the PlatformOperator registry.
+- [x] Complete real-Keycloak PKCE browser acceptance, six-role Firefox/WebKit accessibility, PostgreSQL logical restore and ephemeral environment cleanup.
 
-**Exit:** API migration and unit/integration acceptance are merged; M1 is not fully complete until Local real-Keycloak acceptance passes.
+**Exit:** M1 complete. The global identity backfill and both API and integrated Local acceptance are merged and green. No role, scope or permission authorization behavior was changed by M1.
 
 ### M2 — Multiple scoped role assignments
 
