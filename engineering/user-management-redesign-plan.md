@@ -78,40 +78,49 @@ This is a local-first engineering initiative. Do not select/configure production
 
 ### M2 — Multiple scoped role assignments
 
-**Status: In progress — first additive persistence/compatibility increment is validated in draft review; request-time authorization and user-facing assignment management remain outstanding.**
+**Status: In progress — additive persistence/backfill and assignment request snapshot are validated in draft PRs; the evaluator is in draft review; no existing API authorization consumer has been switched.**
 
-**Current API increment:** [HeapCare.Api PR #162](https://github.com/HeapCare/HeapCare.Api/pull/162), branch `feature/m2-membership-role-assignments`, validated head `88f6381bc184837712c2120cfd937d3544095fdc`.
+**Increment 1 — storage and compatibility:** [HeapCare.Api PR #162](https://github.com/HeapCare/HeapCare.Api/pull/162), branch `feature/m2-membership-role-assignments`, validated head `88f6381bc184837712c2120cfd937d3544095fdc`.
 
-Implemented in this increment:
+- Adds tenant-owned MembershipRoleAssignment and assignment-owned Tenant/Hospital/Department scopes with restrictive composite relationships and lifecycle/effective-range/actor constraints.
+- Backfills exactly one Active assignment per existing membership, copying current role and exact scope rows; legacy columns/routes remain.
+- Dual-writes initial-admin provisioning and legacy membership create/update. Role change revokes the prior assignment and creates the new active assignment.
+- Membership deactivation remains independent from assignment revocation; inactive membership is still the deny gate.
 
-- Tenant-owned MembershipRoleAssignment and assignment-owned Tenant/Hospital/Department scope records.
-- Restrictive composite tenant, membership, role and facility relationships plus lifecycle, effective-range, actor-pair and scope-shape constraints.
-- Additive backfill of exactly one Active role assignment per existing membership, copying the existing role and exact legacy scope rows while retaining every legacy column and route.
-- Compatibility dual-writes for initial-admin provisioning and legacy membership create/update; role changes retain the previous assignment as Revoked.
-- Membership and assignment lifecycle remain independent: deactivating a membership does not revoke its assignment; the inactive membership itself remains the deny gate, and reactivation restores only assignments not revoked/expired.
-- API regression verifies create, role replacement, scope synchronization, actor attribution, retained revoked history and deactivate/reactivate behavior.
+Exact-head evidence:
+- [API CI #46178720205](https://github.com/HeapCare/HeapCare.Api/actions/runs/46178720205): build + EF model-drift guard passed; 12/12 unit and 277/277 integration tests passed.
+- [Docker Integration Verification #46178720254](https://github.com/HeapCare/HeapCare.Api/actions/runs/46178720254): passed, including container/volume cleanup.
+- [PostgreSQL Migration Rehearsal #46178720245](https://github.com/HeapCare/HeapCare.Api/actions/runs/46178720245): idempotent script, populated upgrade and fresh installation passed.
 
-**Exact-head validation — all green on `88f6381bc184837712c2120cfd937d3544095fdc`:**
+PR #162 remains draft and unmerged; this validates storage/backfill only.
 
-- [API CI #46178720205](https://github.com/HeapCare/HeapCare.Api/actions/runs/46178720205): Release restore/build passed; EF Core pending-model-change guard passed; 12/12 unit tests and 277/277 PostgreSQL integration tests passed.
-- [Docker Integration Verification #46178720254](https://github.com/HeapCare/HeapCare.Api/actions/runs/46178720254): containerized integration verification passed and test containers/volumes were cleaned up.
-- [PostgreSQL Migration Rehearsal #46178720245](https://github.com/HeapCare/HeapCare.Api/actions/runs/46178720245): idempotent migration script generated; populated pre-redesign database upgrade and fresh database installation both passed.
+**Increment 2 — assignment request snapshot:** [HeapCare.Api PR #163](https://github.com/HeapCare/HeapCare.Api/pull/163), branch `feature/m2-assignment-authorization-context`, validated head `1de5b2976ef7741a5e4ead53e2396745c694117e`.
 
-PR #162 remains a **draft** and is not merged. The checks validate this additive persistence slice only; they do not establish that the entire M2 authorization redesign is complete.
+- Loads only Active, currently effective assignments with an active TenantRole and validated permission catalogue grants.
+- Keeps assignment ID, role, exact scopes and permissions together in an immutable request-scoped context.
+- Populates the context from middleware alongside the current legacy context; no route, claim, endpoint or service has switched authorization.
 
-**Next incremental implementation:** [HeapCare.Api PR #163](https://github.com/HeapCare/HeapCare.Api/pull/163) adds an immutable request-scoped snapshot of active/effective role assignments, retaining each assignment's own permission and scope collections. It is a data-only compatibility increment; current legacy authorization remains authoritative. The PR is draft and its exact-head CI and migration checks are still running.
+Exact-head evidence:
+- [API CI #46179687341](https://github.com/HeapCare/HeapCare.Api/actions/runs/46179687341): build + EF model-drift guard passed; 16/16 unit and 278/278 PostgreSQL integration tests passed.
+- [PostgreSQL Migration Rehearsal #46179687378](https://github.com/HeapCare/HeapCare.Api/actions/runs/46179687378): base build, PR build, idempotent script generation, populated upgrade and fresh installation passed.
+- Docker Integration Verification did not trigger because this dependent PR targets the prior feature branch rather than `main`. Run it after PR #162 is merged and #163 is retargeted to `main`.
+
+PR #163 remains draft and unmerged.
+
+**Increment 3 — assignment-aware evaluator:** [HeapCare.Api PR #164](https://github.com/HeapCare/HeapCare.Api/pull/164), branch `feature/m2-assignment-aware-scope-evaluator`, is in draft review with CI running. It adds permission-and-scope checks that require both to exist on the same assignment, while preserving current Tenant/Hospital/Department behavior. It does not wire the evaluator into API services.
 
 **Still outstanding in M2:**
 
-- Introduce the immutable assignment-aware request context and one central permission-plus-scope resolver.
-- Migrate every API reader/writer and scope-dependent service listed in the compatibility inventory; never use separately flattened permission and scope unions.
-- Add explicit assignment-management contracts, lifecycle operations, delegation validation, last-admin protections and append-only before/after audit.
-- Prove positive and negative cases for scope borrowing, sibling hospitals/departments, multiple tenants, membership disablement and role revocation.
-- Complete Local real-Keycloak integrated acceptance and Web assignment-management workflows.
+- Finish exact-head CI/review for PR #164 and run the integrated Docker gate after the dependency chain is retargeted to `main`.
+- Migrate all scope-dependent API readers/writers and services in the compatibility inventory to the assignment-aware evaluator as a coordinated authorization change.
+- Add explicit assignment-management contracts and API operations; assignment revocation/expiry; delegation validation; last-admin safeguards; append-only before/after audit.
+- Add cross-tenant, sibling-hospital, sibling-department, permission/scope-borrowing, membership-disablement and role-revocation regression coverage.
+- Complete Local real-Keycloak acceptance and Web organization user-directory / assignment-management workflows.
 
-TenantAdmin remains gated on an approved permission/delegation matrix. No new clinical grants, IPD permissions, FacilitySite scopes or legacy-column removal are part of PR #162.
+TenantAdmin remains gated on an approved permission/delegation matrix. No new clinical/IPD permissions, patient-visibility changes, FacilitySite scopes or legacy-column removal are part of these increments.
 
-**Exit:** no privilege expansion in backfill; all role/scope resolver and management tests prove assignment isolation; cross-tenant, cross-hospital and cross-department tests pass; exact-head API, migration, Docker and Local acceptance are green.
+**Exit:** no privilege expansion in backfill; assignment-aware authorization proves each permission against its own assignment scope; all services and management workflows are migrated and tested; exact-head API, Docker, PostgreSQL and Local acceptance are green.
+
 ### M3 — Identity-provider lifecycle and invitations
 
 **Repositories:** HeapCare.Api; HeapCare.Local; possibly HeapCare.OtpService only after its separate security gates.
