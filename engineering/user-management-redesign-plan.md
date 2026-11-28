@@ -9,6 +9,7 @@
 ## GitHub tracking
 
 - **Architecture epic:** [HeapCare.Doc #228](https://github.com/HeapCare/HeapCare.Doc/issues/228)
+- **Compatibility inventory:** [engineering/user-management-compatibility-inventory.md](user-management-compatibility-inventory.md) — initial API/Web dependency map; exhaustive search and final resolver contract remain M0 gates.
 - **API identity and role-assignment migration:** [HeapCare.Api #159](https://github.com/HeapCare/HeapCare.Api/issues/159)
 - **API identity lifecycle and invitations:** [HeapCare.Api #160](https://github.com/HeapCare/HeapCare.Api/issues/160)
 - **Web administration workflows:** [HeapCare.Web #110](https://github.com/HeapCare/HeapCare.Web/issues/110)
@@ -41,9 +42,10 @@ This is a local-first engineering initiative. Do not select/configure production
 
 - [x] Inspect current API identity, membership, scope, role, permission and platform-operator implementation.
 - [x] Inspect current Web feature areas for membership and platform administration.
+- [x] Record the initial source-backed compatibility inventory for the request-time authorization chain, persistence, endpoints and Web screens.
 - [x] Confirm no open PRs in Api, Web, Local or Doc at the start of this workstream.
 - [ ] Merge ADR-020 and this execution plan after review.
-- [ ] Create linked implementation issues in the affected repositories.
+- [x] Create linked implementation issues in the affected repositories.
 - [ ] Inventory every use of legacy membership Role and membership-level scopes.
 - [ ] Define and record invariants and the privilege-preserving backfill contract.
 
